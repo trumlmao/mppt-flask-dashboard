@@ -1,12 +1,65 @@
-<!-- templates/home.html -->
+<!-- templates/home.html (phiên bản cập nhật) -->
 
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Live MPPT Dashboard</title>
+    <!-- Copy đoạn CSS từ nhiệm vụ trước để cho đẹp -->
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;}
+        .card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); min-width: 350px; text-align: center; }
+        h1 { color: #1c1e21; margin-bottom: 20px; }
+        .metric { margin: 18px 0; font-size: 20px; }
+        .label { color: #606770; }
+        .value { font-weight: bold; color: #0d6efd; }
+    </style>
+</head>
 <body>
-    <h1>Bảng điều khiển</h1>
-    <h2>Điện áp hiện tại: {{ data.voltage }} V</h2>
-    <h2>temp hiện tại: {{ data.temp }} C</h2>
-    <h2>bat_cur hiện tại: {{ data.battery_curr }} A</h2>
+    <div class="card">
+        <h1>Bảng điều khiển Live</h1>
+        
+        <div class="metric">
+            <span class="label">Điện áp hiện tại: </span>
+            <!-- Thêm id="voltage-value" để JS có thể tìm thấy -->
+            <span class="value" id="voltage-value">...</span> V
+        </div>
+        
+        <div class="metric">
+            <span class="label">Nhiệt độ hiện tại: </span>
+            <!-- Thêm id="temp-value" -->
+            <span class="value" id="temp-value">...</span> C
+        </div>
+        
+        <div class="metric">
+            <span class="label">Dòng điện pin: </span>
+            <!-- Thêm id="current-value" -->
+            <span class="value" id="current-value">...</span> A
+        </div>
+    </div>
 
+    <!-- ===== PHẦN JAVASCRIPT BẮT ĐẦU TỪ ĐÂY ===== -->
+    <script>
+        // Hàm này sẽ được gọi để lấy và cập nhật dữ liệu
+        function updateDashboard() {
+            // Dùng fetch để gọi API /api/latest-data
+            fetch('/api/latest-data')
+                .then(response => response.json()) // Chuyển đổi phản hồi thành JSON
+                .then(data => {
+                    // Khi có dữ liệu, tìm các phần tử theo ID và cập nhật nội dung
+                    document.getElementById('voltage-value').innerText = data.voltage;
+                    document.getElementById('temp-value').innerText = data.temp;
+                    document.getElementById('current-value').innerText = data.battery_curr;
+                })
+                .catch(error => console.error('Lỗi khi lấy dữ liệu:', error)); // Báo lỗi nếu có
+        }
+
+        // Tự động gọi hàm updateDashboard() sau mỗi 3 giây (3000 mili giây)
+        setInterval(updateDashboard, 3000);
+
+        // Gọi hàm ngay lần đầu tiên khi trang vừa tải xong
+        // để không phải chờ 3 giây đầu tiên
+        updateDashboard(); 
+    </script>
+    <!-- ===== PHẦN JAVASCRIPT KẾT THÚC ===== -->
 </body>
 </html>
