@@ -1,0 +1,26 @@
+<!-- templates/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MPPT Dashboard</title>
+    <meta http-equiv="refresh" content="5">
+    <style>
+        body { font-family: sans-serif; background-color: #f0f2f5; margin: 40px;}
+        .dashboard { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #1c1e21; }
+        .metric { font-size: 24px; margin: 15px 0; }
+        .label { font-weight: bold; color: #606770; }
+        .value { color: #1877f2; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Bảng điều khiển MPPT thời gian thực</h1>
+        <div class="metric"><span class="label">Điện áp tấm pin:</span><span class="value">{{ data.panel_voltage }} V</span></div>
+        <div class="metric"><span class="label">Điện áp pin:</span><span class="value">{{ data.battery_voltage }} V</span></div>
+        <div class="metric"><span class="label">Nhiệt độ:</span><span class="value">{{ data.temperature }} °C</span></div>
+        <p style="text-align: right; color: #999;"><i>Tự động cập nhật sau 5 giây...</i></p>
+    </div>
+</body>
+</html>

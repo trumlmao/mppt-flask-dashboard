@@ -1,0 +1,9 @@
+# Môi trường ảo của Python
+venv/
+__pycache__/
+
+# File cấu hình của VS Code
+.vscode/
+
+# Các file hệ điều hành
+.DS_Store
