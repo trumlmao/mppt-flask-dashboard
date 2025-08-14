@@ -1,31 +1,55 @@
-
 # simulator.py
 
-# Cần thư viện 'requests' để gửi yêu cầu HTTP
-import requests
+import paho.mqtt.client as mqtt
 import time
 import random
+import json # <-- Cần import json
 
-# Địa chỉ "cánh cửa" POST của server chúng ta
-API_ENDPOINT = "http://127.0.0.1:5000/data"
+# --- Cấu hình ---
+BROKER_ADDRESS = "localhost"
+PORT = 1883
+TOPIC = "mppt/data"
+CLIENT_ID = "mppt_simulator_01" 
 
-# Vòng lặp gửi dữ liệu mỗi 3 giây
-while True:
-    try:
-        # Dữ liệu cần gửi, dưới dạng Dictionary
-        data_to_send = {"voltage": round(random.uniform(12, 35), 1),
-                        "temp": round(random.uniform(20,50),1),
-                        "battery_curr":round(random.uniform(0,5),1)}
+# --- Khởi tạo MQTT Client ---
+# Truyền Client ID vào khi tạo client
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, CLIENT_ID)
+
+print(f"Đang kết nối đến Broker tại {BROKER_ADDRESS}...")
+client.connect(BROKER_ADDRESS, PORT)
+
+# Bắt đầu vòng lặp của client trên một luồng riêng
+client.loop_start() 
+print("Kết nối thành công! Bắt đầu gửi dữ liệu...")
+
+try:
+    while True:
+        # 1. Tạo dữ liệu ngẫu nhiên
+        data_to_send = {
+            "voltage": round(random.uniform(12, 35), 1),
+            "temp": round(random.uniform(20, 50), 1),
+            "battery_curr": round(random.uniform(0, 5), 1)
+        }
         
-        print("Đang gửi:", data_to_send)
+        # 2. Chuyển đổi dictionary thành chuỗi JSON
+        payload = json.dumps(data_to_send)
         
-        # Gửi dữ liệu bằng phương thức POST
-        response = requests.post(url=API_ENDPOINT, json=data_to_send)
+        # 3. Publish chuỗi JSON lên topic
+        result = client.publish(TOPIC, payload)
         
-        # In ra phản hồi từ server
-        print("Phản hồi từ server:", response.text)
-        
-    except Exception as e:
-        print("Lỗi:", e)
-        
-    time.sleep(3)
+        # Kiểm tra xem publish có thành công không
+        if result[0] == 0:
+            print(f"Đã gửi: {payload}")
+        else:
+            print(f"Gửi thất bại, mã lỗi: {result[0]}")
+            
+        # 4. Đợi
+        time.sleep(3)
+
+except KeyboardInterrupt:
+    print("Dừng chương trình.")
+finally:
+    # Dừng vòng lặp của client và ngắt kết nối
+    client.loop_stop()
+    client.disconnect()
+    print("Đã ngắt kết nối.")

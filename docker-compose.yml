@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  # Dịch vụ Môi giới Tin nhắn MQTT
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: mosquitto_broker
+    ports:
+      # Mở cổng 1883 để các thiết bị có thể kết nối từ máy của bạn
+      - "1883:1883"
+    volumes:
+      # Kết nối thư mục config ở máy bạn với thư mục config trong container
+      - ./mosquitto/config:/mosquitto/config
+      # Kết nối thư mục data để lưu trữ dữ liệu (nếu cần)
+      - ./mosquitto/data:/mosquitto/data
